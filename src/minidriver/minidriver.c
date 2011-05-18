@@ -99,7 +99,7 @@ static void logprintf(PCARD_DATA pCardData, int level, const char* format, ...)
 {
 	va_list arg;
 	VENDOR_SPECIFIC *vs;
-/* #define CARDMOD_LOW_LEVEL_DEBUG 1 */
+#define CARDMOD_LOW_LEVEL_DEBUG 1 
 #ifdef CARDMOD_LOW_LEVEL_DEBUG
 /* Use a simplied log to get all messages including messages
  * before opensc is loaded. The file must be modifiable by all
@@ -845,8 +845,10 @@ DWORD WINAPI CardReadFile(__in PCARD_DATA pCardData,
 					char guid[MAX_CONTAINER_NAME_LEN + 1];
 
 					r = sc_pkcs15_get_guid(vs->p15card, vs->cert_objs[i], guid, sizeof(guid));
-					if (r)
+					if (r) {
+						logprintf(pCardData, 2, "sc_pkcs15_get_guid return %d\n", r);
 						return r;
+					}
 
 					logprintf(pCardData, 7, "Guid=%s\n", guid);
 

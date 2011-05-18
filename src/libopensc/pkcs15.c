@@ -2198,17 +2198,21 @@ sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object
 	if (p15card->ops.get_guid)
 		return p15card->ops.get_guid(p15card, obj, out, out_size);
 
-	rv = sc_pkcs15_get_object_id(obj, &id);
-	if (rv)
-		return rv;
-
-	rv = sc_card_ctl(p15card->card, SC_CARDCTL_GET_SERIALNR, &serialnr);                                        
-	if (rv)
-		return rv;
-
 	memset(guid_bin, 0, sizeof(guid_bin));
+	rv = sc_pkcs15_get_object_id(obj, &id);
+	if (rv) {
+		return rv;
+	} 
 	memcpy(guid_bin, id.value, id.len);
-	memcpy(guid_bin + id.len, serialnr.value, serialnr.len);
+
+	rv = sc_card_ctl(p15card->card, SC_CARDCTL_GET_SERIALNR, &serialnr);
+	if (rv) {
+		//SAE in case error just ignore it
+		//return rv;
+	} else {
+    		memcpy(guid_bin + id.len, serialnr.value, serialnr.len);
+	}
+
 
 	return sc_pkcs15_serialize_guid(guid_bin, id.len + serialnr.len, out, out_size);
 }
