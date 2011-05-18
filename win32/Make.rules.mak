@@ -23,7 +23,9 @@ OPENSSL_DIR = C:\OpenSSL-Win64
 OPENSSL_DIR = C:\OpenSSL-Win32
 !ENDIF
 OPENSSL_INCL_DIR = /I$(OPENSSL_DIR)\include
-OPENSSL_LIB = $(OPENSSL_DIR)\lib\VC\static\libeay32MT.lib $(OPENSSL_DIR)\lib\VC\static\ssleay32MT.lib user32.lib advapi32.lib crypt32.lib
+#SAE: point to non-static libs, to remove linker error with cookie
+#OPENSSL_LIB = $(OPENSSL_DIR)\lib\VC\static\libeay32MT.lib $(OPENSSL_DIR)\lib\VC\static\ssleay32MT.lib user32.lib advapi32.lib crypt32.lib
+OPENSSL_LIB = $(OPENSSL_DIR)\lib\VC\libeay32MTd.lib $(OPENSSL_DIR)\lib\VC\ssleay32MTd.lib user32.lib advapi32.lib crypt32.lib
 
 PROGRAMS_OPENSSL = pkcs15-init.exe cryptoflex-tool.exe netkey-tool.exe piv-tool.exe westcos-tool.exe
 OPENSC_FEATURES = $(OPENSC_FEATURES) openssl
@@ -35,7 +37,7 @@ OPENSC_FEATURES = $(OPENSC_FEATURES) openssl
 # - uncomment the line starting with ZLIB_DEF 
 # - set the ZLIB_INCL_DIR below to the zlib include lib proceeded by "/I"
 # - set the ZLIB_LIB  below to your zlib lib file
-ZLIB_DEF = /DENABLE_ZLIB
+#ZLIB_DEF = /DENABLE_ZLIB
 !IF "$(ZLIB_DEF)" == "/DENABLE_ZLIB"
 ZLIB_INCL_DIR = /IC:\zlib-1.2.5
 ZLIB_LIB = C:\zlib-1.2.5\zlib.lib
