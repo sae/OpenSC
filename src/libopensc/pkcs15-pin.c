@@ -239,8 +239,10 @@ int sc_pkcs15_verify_pin(struct sc_pkcs15_card *p15card,
 	r = sc_lock(card);
 	SC_TEST_RET(ctx, SC_LOG_DEBUG_NORMAL, r, "sc_lock() failed");
 	/* the path in the pin object is optional */
+	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "pin->path.len=%i\n",pin_info->path.len);
 	if (pin_info->path.len > 0) {
 		r = sc_select_file(card, &pin_info->path, NULL);
+		sc_debug(ctx, SC_LOG_DEBUG_NORMAL, "sc_select_file(%p) retutns :%i)", pin_info->path, r);
 		if (r)
 			goto out;
 	}

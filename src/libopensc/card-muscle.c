@@ -527,6 +527,7 @@ static int muscle_list_files(sc_card_t *card, u8 *buf, size_t bufLen)
 static int muscle_pin_cmd(sc_card_t *card, struct sc_pin_cmd_data *cmd,
 				int *tries_left)
 {
+	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "muscle_pin_cmd() called\n");
 	muscle_private_t* priv = MUSCLE_DATA(card);
 	const int bufferLength = MSC_MAX_PIN_COMMAND_LENGTH;
 	u8 buffer[MSC_MAX_PIN_COMMAND_LENGTH];
@@ -540,6 +541,7 @@ static int muscle_pin_cmd(sc_card_t *card, struct sc_pin_cmd_data *cmd,
 			cmd->apdu = &apdu;
 			cmd->pin1.offset = 5;
 			r = iso_ops->pin_cmd(card, cmd, tries_left);
+		sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "iso_ops->pin_cmd() return %i\n", r);
 			if(r >= 0)
 				priv->verifiedPins |= (1 << cmd->pin_reference);
 			return r;

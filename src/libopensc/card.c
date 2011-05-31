@@ -30,9 +30,9 @@
 #include "internal.h"
 #include "asn1.h"
 
-/*
+
 #define INVALIDATE_CARD_CACHE_IN_UNLOCK
-*/
+
 
 int sc_check_sw(sc_card_t *card, unsigned int sw1, unsigned int sw2)
 {
