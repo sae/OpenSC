@@ -3,10 +3,16 @@ NEWS for OpenSC -- History of user visible changes
 Complete change history is available online:
 http://www.opensc-project.org/opensc/timeline
 
-New in 0.12.1; 2011-04-XX
+New in 0.12.2; 2011-06-XX
+* Greatly improved OpenPGP card support, including OpenPGP 2.0 cards
+  like the one found in German Privacy Foundation CryptoStick
+* Fixed support for FINeID cards issued after 01.03.2011 with 2048bit keys
+
+New in 0.12.1; 2011-05-17
 * New card driver: IAS/ECC 1.0.1
 * rutoken-tool has been deprecated and removed.
 * eidenv and piv-tool utilities now have manual pages.
+* pkcs11-tool now requires the use of --module parameter.
 * All tools can now use an ATR as an argument to --reader, to skip to the
   card with given ATR.
 * opensc-tool -l with -v now shows information about the inserted cards.
