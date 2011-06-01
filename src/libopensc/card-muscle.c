@@ -651,7 +651,12 @@ static int muscle_card_ctl(sc_card_t *card, unsigned long request, void *data)
 		return muscle_card_import_key(card, (sc_cardctl_muscle_key_info_t*) data);
 	case SC_CARDCTL_MUSCLE_VERIFIED_PINS:
 		return muscle_card_verified_pins(card, (sc_cardctl_muscle_verified_pins_info_t*) data);
+	//SAE: for serial number
+	case SC_CARDCTL_GET_SERIALNR:
+		sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "CardCtl(SC_CARDCTL_GET_SERIALNR) not supported.\n", request);
+		return SC_ERROR_NOT_SUPPORTED; 
 	default:
+	    	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "CardCtl (%lu) not supported.\n", request);
 		return SC_ERROR_NOT_SUPPORTED; /* Unsupported.. whatever it is */
 	}
 }
