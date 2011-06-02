@@ -86,17 +86,13 @@ static int muscle_match_card(sc_card_t *card)
 	u8 challenge[8];
 	u8 rbuf[SC_MAX_APDU_BUFFER_SIZE];
 	if (msc_select_applet(card, defaultAppletId, 1) == 1) {
-		//INIT UPDATE
-		//CASE 4 - data sent and expected
-		sc_format_apdu(card, &apdu, SC_APDU_CASE_4_SHORT, 0x50, 0x0, 0x0); 
-		apdu.cla = (u8) 0x80;
-		apdu.le = 0x1c;
+		//Don't use INIT UPDATE ! After some calls card will be blocked !!!
+		//Use GET DATA instead 
+		sc_format_apdu(card, &apdu, SC_APDU_CASE_2_SHORT, 0xCA, 0x0, 0xCF); 
+		apdu.cla = (u8) 0x00;
+		apdu.le = 0xA;
 		apdu.resp = rbuf;
 		apdu.resplen = sizeof(rbuf);
-
-		apdu.lc = 8;//challenge
-		apdu.datalen = 8;
-		apdu.data = challenge;
 		r = sc_transmit_apdu(card, &apdu); 
 		if (r == SC_SUCCESS) {
 			memcpy(serial, &rbuf[4], 4);
