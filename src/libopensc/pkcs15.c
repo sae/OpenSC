@@ -2163,6 +2163,8 @@ static int
 sc_pkcs15_serialize_guid(unsigned char *in, size_t in_size, 
 		char *out, size_t out_size)
 {
+//	sc_context_t *ctx = p15card->card->ctx;
+//	sc_log(ctx, "sc_pkcs15_serialize_guid called;");
 	int ii, jj, offs = 0;
 
 	if (in_size < 16)
@@ -2190,6 +2192,9 @@ int
 sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object *obj,
 		                char *out, size_t out_size)
 {
+	sc_context_t *ctx = p15card->card->ctx;
+	sc_log(ctx, "sc_pkcs15_get_guid called;");
+
 	struct sc_serial_number serialnr;
 	struct sc_pkcs15_id  id;
 	unsigned char guid_bin[SC_PKCS15_MAX_ID_SIZE + SC_MAX_SERIALNR];
@@ -2212,9 +2217,12 @@ sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object
 	} else {
     		memcpy(guid_bin + id.len, serialnr.value, serialnr.len);
 	}
+	//SAE serializing needs minimum 16 bytes of binary data
+	//so use full guid bin length
+        rv = sc_pkcs15_serialize_guid(guid_bin, SC_PKCS15_MAX_ID_SIZE + SC_MAX_SERIALNR, out, out_size);
 
-
-	return sc_pkcs15_serialize_guid(guid_bin, id.len + serialnr.len, out, out_size);
+	sc_log(ctx, "rv: %i; guid: %s;", rv, out);
+	return rv;
 }
 
 void sc_pkcs15_free_key_params(struct sc_pkcs15_key_params *params)   

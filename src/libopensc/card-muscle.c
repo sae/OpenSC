@@ -68,8 +68,9 @@ static int muscle_finish(sc_card_t *card)
 	return 0;
 }
 
-
+static u8 defaultAppletId[] = { 0xA0 }; //default card manager oid, for obtaining card serial number
 static u8 muscleAppletId[] = { 0xA0, 0x00,0x00,0x00, 0x01, 0x01 };
+static u8 serial[4];
 
 static int muscle_match_card(sc_card_t *card)
 {
@@ -80,6 +81,30 @@ static int muscle_match_card(sc_card_t *card)
 	/* Since we send an APDU, the card's logout function may be called...
 	 * however it's not always properly nulled out... */
 	card->ops->logout = NULL;
+
+	//SAE trying to obtain serial nr from cardmgr
+	u8 challenge[8];
+	u8 rbuf[SC_MAX_APDU_BUFFER_SIZE];
+	if (msc_select_applet(card, defaultAppletId, 1) == 1) {
+		//INIT UPDATE
+		//CASE 4 - data sent and expected
+		sc_format_apdu(card, &apdu, SC_APDU_CASE_4_SHORT, 0x50, 0x0, 0x0); 
+		apdu.cla = (u8) 0x80;
+		apdu.le = 0x1c;
+		apdu.resp = rbuf;
+		apdu.resplen = sizeof(rbuf);
+
+		apdu.lc = 8;//challenge
+		apdu.datalen = 8;
+		apdu.data = challenge;
+		r = sc_transmit_apdu(card, &apdu); 
+		if (r == SC_SUCCESS) {
+			memcpy(serial, &rbuf[4], 4);
+			sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "serial number %x%x%x%x", serial[0], serial[1], serial[2], serial[3]); 
+		} else {
+			sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "serial number error %x", r); 
+		}
+	} 
 
 	if (msc_select_applet(card, muscleAppletId, 5) == 1) {
 //SAE: turn off checking
@@ -640,6 +665,21 @@ static int muscle_card_verified_pins(sc_card_t *card, sc_cardctl_muscle_verified
 	info->verifiedPins = priv->verifiedPins;
 	return 0;
 }
+
+//SAE: since muscle applet works on java card only,
+//there are common method to get serial number from javacard
+//but we need a main security domain, not a muscle app !
+//so, serial number obtained when checking for a muscle card
+//here is only stub, that copied serial from local "serial" variable 
+static int muscle_get_serialnr(sc_card_t *card, sc_serial_number_t *serial1)
+{ 
+    sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "serial number %x%x%x%x", serial[0], serial[1], serial[2], serial[3]); 
+    memcpy(serial1->value, serial, 4);
+    serial1->len=4;
+    return SC_SUCCESS;
+}
+
+
 static int muscle_card_ctl(sc_card_t *card, unsigned long request, void *data)
 {
 	switch(request) {
@@ -653,8 +693,7 @@ static int muscle_card_ctl(sc_card_t *card, unsigned long request, void *data)
 		return muscle_card_verified_pins(card, (sc_cardctl_muscle_verified_pins_info_t*) data);
 	//SAE: for serial number
 	case SC_CARDCTL_GET_SERIALNR:
-		sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "CardCtl(SC_CARDCTL_GET_SERIALNR) not supported.\n", request);
-		return SC_ERROR_NOT_SUPPORTED; 
+		return muscle_get_serialnr(card, (sc_serial_number_t*) data);
 	default:
 	    	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "CardCtl (%lu) not supported.\n", request);
 		return SC_ERROR_NOT_SUPPORTED; /* Unsupported.. whatever it is */
