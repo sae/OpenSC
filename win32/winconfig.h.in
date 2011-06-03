@@ -1,3 +1,6 @@
+//turn off link to _ENGINE_load_gost()
+#define OPENSSL_NO_GOST
+
 #ifndef _OPENSC_WINCONFIG_H
 #define _OPENSC_WINCONFIG_H
 
