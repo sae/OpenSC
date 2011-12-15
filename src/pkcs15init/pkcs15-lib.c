@@ -759,7 +759,7 @@ sc_pkcs15init_add_app(struct sc_card *card, struct sc_profile *profile,
 					pin_attrs->flags, pin_attrs->reference, sc_print_path(&pin_ainfo.path));
 			r = sc_pkcs15_add_object(p15card, pin_obj);
 			LOG_TEST_RET(ctx, r, "Failed to add 'SOPIN' AUTH object");
-			sc_log(ctx, "virtual SO_PIN added, path:'%s'",sc_print_path(&pin_info.path));
+			sc_log(ctx, "virtual SO_PIN added, path:'%s'",sc_print_path(&pin_ainfo.path));
 			}
 	}
 
