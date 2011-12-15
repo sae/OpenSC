@@ -77,14 +77,13 @@ static int muscle_match_card(sc_card_t *card)
 	sc_apdu_t apdu;
 	u8 response[64];
 	int r;
+	u8 challenge[8];
+	u8 rbuf[SC_MAX_APDU_BUFFER_SIZE];
 	
 	/* Since we send an APDU, the card's logout function may be called...
 	 * however it's not always properly nulled out... */
 	card->ops->logout = NULL;
 
-	//SAE trying to obtain serial nr from cardmgr
-	u8 challenge[8];
-	u8 rbuf[SC_MAX_APDU_BUFFER_SIZE];
 	if (msc_select_applet(card, defaultAppletId, 1) == 1) {
 		//Don't use INIT UPDATE ! After some calls card will be blocked !!!
 		//Use GET DATA instead 
@@ -548,10 +547,12 @@ static int muscle_list_files(sc_card_t *card, u8 *buf, size_t bufLen)
 static int muscle_pin_cmd(sc_card_t *card, struct sc_pin_cmd_data *cmd,
 				int *tries_left)
 {
-	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "muscle_pin_cmd() called\n");
-	muscle_private_t* priv = MUSCLE_DATA(card);
 	const int bufferLength = MSC_MAX_PIN_COMMAND_LENGTH;
 	u8 buffer[MSC_MAX_PIN_COMMAND_LENGTH];
+	muscle_private_t* priv;
+
+	sc_debug(card->ctx, SC_LOG_DEBUG_NORMAL, "muscle_pin_cmd() called\n");
+	priv = MUSCLE_DATA(card);
 	switch(cmd->cmd) {
 	case SC_PIN_CMD_VERIFY:
 		switch(cmd->pin_type) {

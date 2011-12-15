@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "types.h"
 #include "cardctl.h"
 #include "internal.h"
 #include "pkcs15.h"
@@ -2197,13 +2198,13 @@ sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object
 		                char *out, size_t out_size)
 {
 	sc_context_t *ctx = p15card->card->ctx;
-	sc_log(ctx, "sc_pkcs15_get_guid called;");
 
 	struct sc_serial_number serialnr;
-	struct sc_pkcs15_id  id;
+	struct sc_pkcs15_id id;
 	unsigned char guid_bin[SC_PKCS15_MAX_ID_SIZE + SC_MAX_SERIALNR];
 	int rv;
 
+	sc_log(ctx, "sc_pkcs15_get_guid called;");
 	if (p15card->ops.get_guid)
 		return p15card->ops.get_guid(p15card, obj, out, out_size);
 
