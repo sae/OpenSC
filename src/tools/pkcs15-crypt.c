@@ -124,8 +124,11 @@ static char * get_pin(struct sc_pkcs15_object *obj)
 {
 	char buf[80];
 	char *pincode;
-	struct sc_pkcs15_pin_info *pinfo = (struct sc_pkcs15_pin_info *) obj->data;
-	
+	struct sc_pkcs15_auth_info *pinfo = (struct sc_pkcs15_auth_info *) obj->data;
+
+	if (pinfo->auth_type != SC_PKCS15_PIN_AUTH_TYPE_PIN)
+		return NULL;
+
 	if (opt_pincode != NULL) {
 		if (strcmp(opt_pincode, "-") == 0)
 			return readpin_stdin();
@@ -138,8 +141,8 @@ static char * get_pin(struct sc_pkcs15_object *obj)
 		pincode = getpass(buf);
 		if (strlen(pincode) == 0)
 			return NULL;
-		if (strlen(pincode) < pinfo->min_length ||
-		    strlen(pincode) > pinfo->max_length)
+		if (strlen(pincode) < pinfo->attrs.pin.min_length ||
+		    strlen(pincode) > pinfo->attrs.pin.max_length)
 		    	continue;
 		return strdup(pincode);
 	}
@@ -202,9 +205,9 @@ static int sign(struct sc_pkcs15_object *obj)
 	if (c < 0)
 		return 2;
 	len = sizeof(out);
-	if (obj->type == SC_PKCS15_TYPE_PRKEY_RSA
-	 && !(opt_crypt_flags & SC_ALGORITHM_RSA_PAD_PKCS1)
-	 && (size_t)c != key->modulus_length/8) {
+	if (obj->type == SC_PKCS15_TYPE_PRKEY_RSA 
+			&& !(opt_crypt_flags & SC_ALGORITHM_RSA_PAD_PKCS1)
+			&& (size_t)c != key->modulus_length/8) {
 		fprintf(stderr, "Input has to be exactly %lu bytes, when using no padding.\n",
 			(unsigned long) key->modulus_length/8);
 		return 2;
@@ -443,6 +446,7 @@ int main(int argc, char * const argv[])
 			goto end;
 		action_count--;
 	}
+	
 	if (do_sign) {
 		if ((err = get_key(SC_PKCS15_PRKEY_USAGE_SIGN|
 				   SC_PKCS15_PRKEY_USAGE_SIGNRECOVER|
