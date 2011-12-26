@@ -2,3 +2,16 @@ OpenSC documentation wiki is available online at
 	http://www.opensc-project.org/opensc/
 
 Please take a look at the documentation before trying to use OpenSC.
+
+------
+
+this branch, sae-msg is merged from opensc/opensc, sae-muscle 
+and viktorTarasov/OpenSC/secure-messaging 
+
+sae-muscle is work with muscle applet on GXP7 card, 
+but outlook cannot decrypt messages (signing is ok)
+
+sae-msg minidriver can be used for decrypt in ms outlook
+linux build is work also, tested with thunderbird
+
+------ sae762  26.12.2011 --------------
