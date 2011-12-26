@@ -99,6 +99,10 @@
 #define SCARD_E_UNSUPPORTED_FEATURE 0x8010001F
 #define SCARD_W_WRONG_CHV ((DWORD)0x8010006B)
 #define SCARD_E_FILE_NOT_FOUND ((LONG)0x80100024) 
+#define SCARD_E_DIR_NOT_FOUND ((LONG)0x80100023)
+#define SCARD_W_CHV_BLOCKED  ((LONG)0x8010006C)
+#define SCARD_E_NO_KEY_CONTAINER ((LONG)0x80100030)
+#define CALG_SHA_256 ((LONG)0x0000800c)
 
 struct md_directory {
 	unsigned char parent[9];
@@ -197,11 +201,7 @@ static void logprintf(PCARD_DATA pCardData, int level, const char* format, ...)
 {
 	va_list arg;
 	VENDOR_SPECIFIC *vs;
-<<<<<<< HEAD
 #define CARDMOD_LOW_LEVEL_DEBUG 1 
-=======
-#define CARDMOD_LOW_LEVEL_DEBUG 1
->>>>>>> tarasov/secure-messaging
 #ifdef CARDMOD_LOW_LEVEL_DEBUG
 /* Use a simplied log to get all messages including messages
  * before opensc is loaded. The file must be modifiable by all
@@ -1296,6 +1296,7 @@ md_set_cmapfile(PCARD_DATA pCardData, struct md_file *file)
 			continue;
 		}
 
+		//logprintf(pCardData, 2, "calling sc_pkcs15_get_guid()...\n");
 		rv = sc_pkcs15_get_guid(vs->p15card, key_obj, 0, cont->guid, sizeof(cont->guid));
 		if (rv)   {
 			logprintf(pCardData, 2, "sc_pkcs15_get_guid() error %d\n", rv);
