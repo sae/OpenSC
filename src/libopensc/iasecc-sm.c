@@ -26,9 +26,10 @@
 #include "asn1.h"
 #include "cardctl.h"
 
-#ifndef ENABLE_OPENSSL
-#error "Need OpenSSL"
-#endif
+#ifdef ENABLE_OPENSSL
+//#ifndef ENABLE_OPENSSL
+//#error "Need OpenSSL"
+//#endif
 
 #include "sm.h"
 #include "iasecc.h"
@@ -725,4 +726,5 @@ iasecc_sm_delete_file(struct sc_card *card, unsigned se_num, unsigned int file_i
 #endif
 }
 
+#endif //ENABLE_OPENSSL
 

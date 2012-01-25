@@ -4513,8 +4513,10 @@ test_restricted_usage_object(CK_SESSION_HANDLE session,
 	int need_to_parse_certdata = 0;
 	struct x509cert_info cert;
 	struct rsakey_info rsa;
+//SAE: fixme
+#ifdef ENABLE_OPENSSL
 	EVP_PKEY *evp_key = NULL;
-
+#endif
 	memset(&cert, 0, sizeof(cert));
 	memset(&rsa,  0, sizeof(rsa));
 
@@ -4543,12 +4545,13 @@ test_restricted_usage_object(CK_SESSION_HANDLE session,
 		need_to_parse_certdata = 1;
 	}
 
+//SAE: fixme
+#ifdef ENABLE_OPENSSL
 	if (need_to_parse_certdata)
 		parse_certificate(&cert, certdata, certdata_len);
 
 	if (opt_object_class == CKO_PRIVATE_KEY) {
 		int rv; 
-
 		rv = do_read_private_key(contents, contents_len, &evp_key);
 		if (rv)
 			util_fatal("SM: cannot read private key\n");
@@ -4564,6 +4567,7 @@ test_restricted_usage_object(CK_SESSION_HANDLE session,
 
 	if (opt_object_class == CKO_PUBLIC_KEY)
 		parse_rsa_public_key(&rsa, contents, contents_len);
+#endif
 
 	if (opt_object_class == CKO_CERTIFICATE) {
 		CK_OBJECT_CLASS clazz = CKO_CERTIFICATE;
@@ -4618,7 +4622,8 @@ test_restricted_usage_object(CK_SESSION_HANDLE session,
 			FILL_ATTR(privkey_templ[n_privkey_attr], CKA_SUBJECT, cert.subject, cert.subject_len);
 			n_privkey_attr++;
 		}
-
+//SAE: fixme
+#ifdef ENABLE_OPENSSL
 		if (evp_key->type == EVP_PKEY_RSA)   {
 			CK_KEY_TYPE type = CKK_RSA;
 			FILL_ATTR(privkey_templ[n_privkey_attr], CKA_KEY_TYPE, &type, sizeof(type));
@@ -4640,7 +4645,7 @@ test_restricted_usage_object(CK_SESSION_HANDLE session,
 			FILL_ATTR(privkey_templ[n_privkey_attr], CKA_COEFFICIENT, rsa.coefficient, rsa.coefficient_len);
 			n_privkey_attr++;
 		}
-
+#endif
 		printf("key usage decrypt:%i, sign:%i, nonrepuduation:%i\n", usage_decrypt, usage_sign, usage_nonrepudiation);
 		if (usage_decrypt)   {
 			FILL_ATTR(privkey_templ[n_privkey_attr], CKA_DECRYPT, &_true, sizeof(_true));
