@@ -2489,43 +2489,16 @@ sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object
 	if (p15card->ops.get_guid)
 		return p15card->ops.get_guid(p15card, obj, out, out_size);
 
-//<<<<<<< HEAD
-//	memset(guid_bin, 0, sizeof(guid_bin));
-//=======
-//	if (obj->guid)   {
-//		if (out_size < strlen(obj->guid))
-//			return SC_ERROR_BUFFER_TOO_SMALL;
-//		memset(out, 0, out_size);
-  
-//		if (out_size > strlen(obj->guid))
-//			out_size = strlen(obj->guid);
-//		memcpy(out, obj->guid, out_size);
-
-//		return SC_SUCCESS;
-//	}
-
-//>>>>>>> tarasov/secure-messaging
 	rv = sc_pkcs15_get_object_id(obj, &id);
 	if (rv) {
 		return rv;
 	} 
 	memcpy(guid_bin, id.value, id.len);
 
-//<<<<<<< HEAD
-//	rv = sc_card_ctl(p15card->card, SC_CARDCTL_GET_SERIALNR, &serialnr);
-//	if (rv) {
-//		//SAE in case error just ignore it
-//		//return rv;
-//	} else {
-//    		memcpy(guid_bin + id.len, serialnr.value, serialnr.len);
-//	}
-	//SAE serializing needs minimum 16 bytes of binary data
-	//so use full guid bin length
-//        rv = sc_pkcs15_serialize_guid(guid_bin, SC_PKCS15_MAX_ID_SIZE + SC_MAX_SERIALNR, out, out_size);
+//SAE: on macosx SHA1 go to crash "pkcs15-tool -D" 
+//but OpenSSL cannot be disabled now, because "isaecc" required it
+//as a workaround - comment following code under macosx
 
-//	sc_log(ctx, "rv: %i; guid: %s;", rv, out);
-//	return rv;
-//=======
         // If OpenSSL is available (SHA1), then rather use the hash of the data
         // - this also protects against data being too short
 #ifdef ENABLE_OPENSSL
@@ -2535,7 +2508,6 @@ sc_pkcs15_get_guid(struct sc_pkcs15_card *p15card, const struct sc_pkcs15_object
 #endif
 
 	return sc_pkcs15_serialize_guid(guid_bin, id.len + serialnr.len, flags, out, out_size);
-//>>>>>>> tarasov/secure-messaging
 }
 
 void sc_pkcs15_free_key_params(struct sc_pkcs15_key_params *params)   
